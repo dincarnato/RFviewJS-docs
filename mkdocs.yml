@@ -1,0 +1,14 @@
+site_name: RFviewJS
+theme:
+    name: readthedocs
+    highlightjs: true
+    hljs_languages:
+        - yaml
+        - javascript
+pages:
+    - 'Overview': 'index.md'
+    - 'Interface': 'interface.md'
+    - 'Web page embedding': 'webpage.md'
+    - 'Standalone': 'standalone.md'
+markdown_extensions:
+    - markdown.extensions.admonition
