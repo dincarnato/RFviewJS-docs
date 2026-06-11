@@ -380,7 +380,7 @@ __Note #2:__ when annotating structures loaded from Stockholm alignments, `i` re
 
 ### loadCov()
 
-Loads __[R-scape](https://github.com/EddyRivasLab/R-scape)__'s covariation files (`.cov` or `.helixcov` format), or TSV files (please see __[File formats](https://rfviewjs-docs.readthedocs.io/en/latest/file-formats/#base-pair-and-helix-level-annotations)__ for more information) onto the currently displayed structure. The method auto-detects the format.
+Loads __[R-scape](https://github.com/EddyRivasLab/R-scape)__'s covariation files (`.cov` or `.helixcov` format), or TSV files (please see __[File formats](https://rfviewjs-docs.readthedocs.io/en/latest/file-formats/#base-pair-helix-level-annotations)__ for more information) onto the currently displayed structure. The method auto-detects the format.
 
 ```js
 try {

@@ -17,10 +17,11 @@ The toolbar contains the following:
 
 ### Loading structures, reactivity data &amp; annotations
 
-Structures can be loaded in one of three ways:
+Structures can be loaded in one of four ways:
 
 - Structure files via the __Load structure/reactivity/annotation__ dialog
 - Structure files by direct drag-and-drop onto the canvas area
+- Fetching of alignments from __[Rfam](https://rfam.org/)__
 - Manual sequence/structure input via the __Manually enter sequence &amp; structure__ dialog
 
 The __Load structure/reactivity/annotation__ dialog provides an easy and intuitive interface for data loading, enabling the simultaneous import of structures, reactivity data and annotations:
