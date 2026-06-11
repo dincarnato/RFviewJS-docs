@@ -120,6 +120,7 @@ $ RFview --help
 Parameter         | Type | Description
 ----------------: | :--: |:------------
 __--structureFile__ | string | Path to a structure file (.db, .dbn, .ct, .txt) or to a Stockholm alignment [required]
+__--rfam__ | string | Rfam family ID to fetch directly from Rfam (e.g., RF00162)<br/>__Note:__ `--rfam` and `--structureFile` are mutually exclusive
 __--xml__ | string | Reactivity file (in [RNA Framework's XML format](https://rnaframework-docs.readthedocs.io/en/latest/rf-norm/#output-xml-files))
 __--basePairAnno__ | string | Pair-annotation file (.tsv, .txt) or R-scape's .cov file
 __--helixCovAnno__ | string | R-scape's .helixcov helix-level covariation file
