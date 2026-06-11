@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="https://rfview.incarnatolab.com/images/RFview_logo.png" />
+  <img src="https://rfview.incarnatolab.com/images/RFview_logo.png" width="50%"/>
 </p>
 <br/>
 
-# RFview.js - RNA Framework Structure Viewer
+# RFviewJS - RNA Framework Structure Viewer
 
 ## Introduction
 
-__[RFview.js](https://github.com/dincarnato/RFviewJS)__ is a self-contained JavaScript library for rendering RNA secondary structures and consensus structures from Stockholm alignments. It supports, __all without any external dependencies__:
+__[RFviewJS](https://github.com/dincarnato/RFviewJS)__ is a self-contained JavaScript library for rendering RNA secondary structures and consensus structures from Stockholm alignments. It supports, __all without any external dependencies__:
 
 - automatic layout selection (Radiate vs. NAView)
 - manual helix rotation, reactivity color mapping (SHAPE/DMS)
@@ -42,7 +42,7 @@ This program is free software, and can be redistribute and/or modified under the
 Please see <http://www.gnu.org/licenses/> for more information.
 
 
-## Documentation
+## Demo
 
-For any information, please refer to the documentation: <http://rfviewjs-docs.readthedocs.io/>
+__RFviewJS__ can be tested at: <https://rfview.incarnatolab.com>
 

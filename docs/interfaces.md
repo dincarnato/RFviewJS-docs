@@ -62,7 +62,7 @@ When reactivity data is loaded, an additional __Reactivity__ tab will appear:
   <img src="http://rfview.incarnatolab.com/images/RFview_settings_reactivity.png" width="50%"/>
 </p>
 
-Through this tab, the user can define the color scale used to render base reactivities. The default scheme uses a simple discretization of values between 0 and 0.3 (low reactivity), 0.3 and 0.7 (medium reactivity) and 0.7+ (high reactivity). Additional steps can be added as needed, or a continuous color scale can be adopted instead.
+Through this tab, the user can define the color scale used to render base reactivities. The default scheme uses a simple discretization of values between 0 and 0.3 (low reactivity), 0.3 and 0.7 (medium reactivity) and 0.7+ (high reactivity). Additional stops can be added as needed, or a continuous color scale can be adopted instead.
 
 Similarly, when base-pair/helix annotations are loaded, an additional __Annotations__ tab will appear:
 

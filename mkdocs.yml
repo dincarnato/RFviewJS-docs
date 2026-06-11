@@ -7,8 +7,8 @@ theme:
         - javascript
 pages:
     - 'Overview': 'index.md'
-    - 'Interface': 'interface.md'
-    - 'Web page embedding': 'webpage.md'
-    - 'Standalone': 'standalone.md'
+    - 'User interfaces': 'interfaces.md'
+    - 'API': 'api.md'
+    - 'File formats': 'file-formats.md'
 markdown_extensions:
     - markdown.extensions.admonition
