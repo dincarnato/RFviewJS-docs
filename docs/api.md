@@ -75,6 +75,7 @@ const viewer = new RFviewJS(container, options);
 | `height` | `numeric` \| `string` | — | Height of the container |
 | `id` | `string` | — | Used as the basename when saving the structure as SVG |
 | `colorMap` | `object` | — | A [colorMap object](#color-maps) used as the default for the initial `load()` call triggered by the constructor (__Note:__ it has no effect on subsequent `load()` calls) |
+| `relaxedSequence` | `boolean` | `false` | Disables sequence character validation, allowing any character (custom alphabets) to be used. When enabled, all base pairs are rendered as single lines regardless of the base identity |
 
 The constructor always calls `load(options)` at the end, so any key accepted by `load()` can be passed directly to the constructor.
 
