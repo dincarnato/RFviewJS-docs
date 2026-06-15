@@ -69,6 +69,8 @@ const viewer = new RFviewJS(container, options);
 | `showIndices` | `boolean` | `true` | Shows position index labels |
 | `showColors` | `boolean` | `true` | Shows reactivity colors to bases on load (see `colorMap` below) |
 | `showPairAnnotations` | `boolean` | `true` | Shows base-pair/helix-level annotation boxes on load |
+| `showR3d` | `boolean` | `true` | Shows CaCoFold-R3D annotations (when present) on load |
+| `showSsEnds` | `boolean` | `false` | Shows single-stranded (unstructured) nucleotides at either ends of a structure (off by default) |
 | `transitionDuration` | `numeric` | `600` | Duration (in ms) of the transition when switching between alternative structures that share the same sequence |
 | `buttons` | `object` \| `false` | all on | Fine-grained toolbar control (see [Toolbar buttonw](#toolbar-buttons) below) |
 | `width` | `numeric` \| `string` | — | Width of the container (e.g. `800` or `'100%'`) |
@@ -101,6 +103,8 @@ const viewer = new RFviewJS(container, {
     colorMap:        true,   // Toggle display reactivities
     pairAnnotations: true,   // Toggle display base-pair/helix-level annotations
     pseudoknots:     true,   // Toggle display pseudoknots
+    r3d:             true,   // Toggle display CaCoFold-R3D annotations (when present)
+    ssEnds:          true,   // Toggle display single-stranded bases at either ends of a structure (when present)
     layout:          true,   // Structure rendering layout switching
     toolbarPos:      true,   // Toolbar repositioning
   }
@@ -122,6 +126,8 @@ Omitted keys default to `true`. Setting `buttons: false` is equivalent to settin
 | `setShowIndices()` | `bool` | Shows or hides position index labels |
 | `setShowColors()` | `bool` | Toggles reactivity coloring |
 | `setShowPairAnnotations()` | `bool` | Toggles base-pair/helix-level annotation boxes |
+| `setShowR3d()` | `bool` | Toggles CaCoFold-R3D annotations |
+| `setShowSsEnds()` | `bool` | Toggles rendering of single-stranded nucleotides at either ends of a structure |
 | `setLayoutAlgorithm()` | `algorithm` | Switches the RNA structure rendering algorithm (`'auto'`, `'radiate'`, or `'naview'`) and re-renders |
 | `fetchRfam()` | `id` | Fetches a Stockholm alignment from Rfam by family ID (e.g., `'RF00162'`) and loads it |
 | `exportSVGString()` | | Renders the current structure and returns it as an SVG string. Useful for programmatic export without triggering a file-save dialog |
