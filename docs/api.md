@@ -5,7 +5,7 @@ __RFviewJS__ is a self-contained JavaScript module for RNA secondary structure v
 
 ## Installation
 
-To install __RFviewJS__ on your webpage, just obtain `RFview.js` from the [Git repository](https://github.com/dincarnato/rfviewjs) (under `renderer/RFview.js`), upload it to your webserver and include it with a plain `<script>` tag:
+To install __RFviewJS__ on your webpage, just obtain `RFview.js` from the [Git repository](https://github.com/dincarnato/rfviewjs) (under `scripts/RFview.js`), upload it to your webserver and include it with a plain `<script>` tag:
 
 ```html
 <script src="path/to/RFview.js"></script>
@@ -69,7 +69,8 @@ const viewer = new RFviewJS(container, options);
 | `showIndices` | `boolean` | `true` | Shows position index labels |
 | `showColors` | `boolean` | `true` | Shows reactivity colors to bases on load (see `colorMap` below) |
 | `showPairAnnotations` | `boolean` | `true` | Shows base-pair/helix-level annotation boxes on load |
-| `showR3d` | `boolean` | `true` | Shows CaCoFold-R3D annotations (when present) on load |
+| `showInsets` | `boolean` | `true` | Shows inset panels of non-nested interactions for Stockholm structures on load |
+| `showLabels` | `boolean` | `true` | Shows labels of SS_cons annotations for Stockholm structures on load |
 | `showSsEnds` | `boolean` | `false` | Shows single-stranded (unstructured) nucleotides at either ends of a structure (off by default) |
 | `transitionDuration` | `numeric` | `600` | Duration (in ms) of the transition when switching between alternative structures that share the same sequence |
 | `buttons` | `object` \| `false` | all on | Fine-grained toolbar control (see [Toolbar buttonw](#toolbar-buttons) below) |
@@ -103,7 +104,8 @@ const viewer = new RFviewJS(container, {
     colorMap:        true,   // Toggle display reactivities
     pairAnnotations: true,   // Toggle display base-pair/helix-level annotations
     pseudoknots:     true,   // Toggle display pseudoknots
-    r3d:             true,   // Toggle display CaCoFold-R3D annotations (when present)
+    insets:          true,   // Toggle display of inset panels (Stockholm structures)
+    labels:          true,   // Toggle display of labels from SS_cons annotation lines (Stockholm structures)
     ssEnds:          true,   // Toggle display single-stranded bases at either ends of a structure (when present)
     layout:          true,   // Structure rendering layout switching
     toolbarPos:      true,   // Toolbar repositioning
@@ -126,7 +128,8 @@ Omitted keys default to `true`. Setting `buttons: false` is equivalent to settin
 | `setShowIndices()` | `bool` | Shows or hides position index labels |
 | `setShowColors()` | `bool` | Toggles reactivity coloring |
 | `setShowPairAnnotations()` | `bool` | Toggles base-pair/helix-level annotation boxes |
-| `setShowR3d()` | `bool` | Toggles CaCoFold-R3D annotations |
+| `setShowInsets()` | `bool` | Toggles inset panels for non-nested interactions (Stockholm structures) |
+| `setShowLabels()` | `bool` | Toggles labels for SS_cons annotation lines (Stockholm structures) |
 | `setShowSsEnds()` | `bool` | Toggles rendering of single-stranded nucleotides at either ends of a structure |
 | `setLayoutAlgorithm()` | `algorithm` | Switches the RNA structure rendering algorithm (`'auto'`, `'radiate'`, or `'naview'`) and re-renders |
 | `fetchRfam()` | `id` | Fetches a Stockholm alignment from Rfam by family ID (e.g., `'RF00162'`) and loads it |
@@ -205,7 +208,7 @@ viewer.load({ stockholmText: stockholmFileText, label: 'RF00162' });
 viewer.load({ fileText: structureFileText });
 ```
 
-When `label` is provided, it overrides the name extracted from the file (e.g., `#=GF ID` or `#=GF AC` for Stockholm files). If the file contains multiple records, the label is suffixed with `(1)`, `(2)`, and so on.
+When `label` is provided, it overrides the name extracted from the file (e.g., `#=GF AC` or `#=GF ID` for Stockholm files). If the file contains multiple records, the label is suffixed with `(1)`, `(2)`, and so on.
 
 Stockholm files are parsed into a consensus structure. The alignment view (conservation colors, alignment track) is shown alongside the structure diagram. Gap-only columns are filtered out. Position labels are remapped so that covariation data loaded afterwards aligns correctly. For additional details, please see __[Visualization of structures from Stockholm alignments](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#visualization-of-structures-from-stockholm-alignments)__.
 
@@ -342,7 +345,7 @@ where:
 | `j` | `numeric` | `pairs[i]` | 0-indexed position of the second base of the pair (optional). Defaults to the pair partner of `i` in the current structure |
 | `color` | `string` | | Hex color (__Note:__`color` and `value` are mutually exclusive) |
 | `value` | `numeric` | | Mapped to a color through `pairAnnotColorMap` (__Note:__`color` and `value` are mutually exclusive) |
-| `opacity` | `numeric` | `0.3` | Fill opacity |
+| `opacity` | `numeric` | `0.5` | Fill opacity |
 | `strokeWidth` | `numeric` | `1.5` | Border thickness |
 | `padding` | `numeric` | `5` | Extra padding around the base-pair in scene units |
 
@@ -374,7 +377,7 @@ where:
 |---|---|---|---|
 | `i` | `numeric` | | 0-indexed position of any base within the target helix (required). Must be a paired position |
 | `color` | `string` | `--rv-helix-annot-color` | Hex color of the annotation box. Falls back to the CSS custom property `--rv-helix-annot-color` |
-| `opacity` | `numeric` | `0.08` | Fill opacity |
+| `opacity` | `numeric` | `0.5` | Fill opacity |
 | `strokeWidth` | `numeric` | `1.5` | Border thickness |
 | `padding` | `numeric` | `--rv-helix-annot-padding` | Extra padding around the helix in scene units. Falls back to the CSS custom property `--rv-helix-annot-padding` |
 
@@ -425,21 +428,16 @@ viewer.loadHelixCov(helixCovText);
 
 ## Static methods
 
-### `RFviewJS.parseStockholmFile(text, labelFallback)`
-
-Parses a Stockholm alignment and returns an array of structure-record objects suitable for spreading into a `structures` array. The label is taken from `#=GF ID` or `#=GF AC`, falling back to `labelFallback`:
-
-```js
-const records = RFviewJS.parseStockholmFile(stockholmText, 'RF00162');
-// Returns [{label, sequence, structure, baseDisplay, positionLabels, ...}]
-
-viewer.load({
-  structures: [
-    ...RFviewJS.parseStockholmFile(sto1, 'RF00162'),
-    ...RFviewJS.parseStockholmFile(sto2, 'RF00504'),
-  ],
-});
-```
+| Method | Description |
+|--------|-------------|
+| `RFviewJS.parseStockholmFile(text, labelFallback)` | Parses a Stockholm alignment and returns an array of structure-record objects suitable for spreading into a `structures` array (the label is taken from `#=GF ID` or `#=GF AC`, falling back to `labelFallback`) |
+| `RFviewJS.parseDbFile(text, label)` | Parses a dot-bracket or CT file and returns an array of structure records |
+| `RFviewJS.parseCTFile(text)` | Parses a CT file and returns structure records |
+| `RFviewJS.parseXmlReactivity(text)` | Parses an RNA Framework XML reactivity file |
+| `RFviewJS.parsePairAnnotFile(text)` | Parses a TSV pair-annotation file |
+| `RFviewJS.parseCovFile(text)` | Parses an R-scape `.cov` file |
+| `RFviewJS.parseHelixCovFile(text)` | Parses an R-scape `.helixcov` file |
+| `RFviewJS.buildAnnotColorMap(pairs)` | Builds a color map for a set of pair annotations |
 
 
 ## CSS custom properties
@@ -447,16 +445,19 @@ viewer.load({
 All visual properties are exposed as CSS custom properties set on the `.rv` root element, so any theme can be applied from a stylesheet without touching the JS.
 
 
-### color palette
+### Color palette
 
 | Property | Default | Description |
 |---|---|---|
 | `--rv-bg` | `#ffffff` | Canvas and toolbar background |
 | `--rv-surface` | `#f6f8fa` | Panel and dialog background |
-| `--rv-border` | `#d0d7de` | Border color for panels and controls. |
+| `--rv-border` | `#d0d7de` | Border color for panels and controls |
 | `--rv-text` | `#1f2328` | Primary text color |
 | `--rv-muted` | `#656d76` | Secondary / label text color |
 | `--rv-accent` | `#0969da` | Buttons, links, and highlights |
+| `--rv-accent2` | `#2da44e` | Secondary accent (green), used for pair formation highlights |
+| `--rv-accent3` | `#8250df` | Tertiary accent (purple) |
+| `--rv-error-border` | — | Border color for error states |
 | `--rv-error` | `#cf222e` | Error messages |
 
 
@@ -479,19 +480,35 @@ All visual properties are exposed as CSS custom properties set on the `.rv` root
 | `--rv-base-label-font` | `monospace` | Nucleotide letter font |
 | `--rv-base-label-font-size` | `13` | Nucleotide letter size in px |
 | `--rv-base-index-color` | `#656d76` | Position index label color |
+| `--rv-base-index-font` | `monospace` | Font family for position index labels |
 | `--rv-base-index-font-size` | `12` | Position index label size in px |
 | `--rv-base-index-offset` | `26` | Distance from base centre to index label |
+| `--rv-noncanon-dot-r` | `4.5` | Radius of the dot drawn for non-canonical base pairs |
+| `--rv-pair-break` | `#ef4444` | Color of base-pairs lost between start and end structure (sharing same sequence) during the animated structure transition |
+| `--rv-pair-form` | `#22c55e` | Color of base-pairs gained between start and end structure (sharing same sequence) during the animated structure transition |
+| `--rv-rot-line` | `#0969da80` | Color of the rotation axis line shown during helix rotation |
+| `--rv-rot-ring` | `#0969da20` | Color of the rotation handle ring shown during helix rotation |
+
+
+### Insets for non-nested interactions
+
+| Property | Default | Description |
+|---|---|---|
+| `--rv-inset-max-width` | `120px` | Maximum width of inset panels (automatically set to 1/20th of the canvas width at render time, overriding this default) |
+| `--rv-inset-min-width` | `80px` | Minimum width of inset panels |
+| `--rv-inset-hover-glow` | `8px` | Glow radius of bases in the main structure when hovering over an inset panel |
 
 
 ### Base-pair annotations
 
 | Property | Default | Description |
 |---|---|---|
-| `--rv-pair-annot-opacity` | `0.3` | Default fill opacity for annotation boxes |
+| `--rv-pair-annot-opacity` | `0.5` | Default fill opacity for annotation boxes |
 | `--rv-pair-annot-stroke-width` | `1.5` | Default border width for annotation boxes |
 | `--rv-pair-annot-padding` | `16` | Default padding around pairs in scene units |
-| `--rv-helix-annot-padding` | `21` | Padding for helix-level annotation boxes |
-| `--rv-helix-annot-color` | `#ef4444` | Helix-level annotation box color |
+| `--rv-helix-annot-opacity` | `0.5` | Default fill opacity for helix-level annotation boxes |
+| `--rv-helix-annot-padding` | `25` | Padding for helix-level annotation boxes |
+| `--rv-helix-annot-color` | `#aff0a8` | Helix-level annotation box color |
 
 Several CSS stylesheet examples are available from the [Git repository](https://github.com/dincarnato/rfviewjs) (under `css/`).
 

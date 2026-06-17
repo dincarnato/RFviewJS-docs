@@ -127,4 +127,7 @@ __--helixCovAnno__ | string | R-scape's .helixcov helix-level covariation file
 __--layout__ | string | Layout for RNA secondary structure rendering:  __auto__ (automatically determines the best layout between naview and radiate to avoid overlaps between helices), __naview__, or __radiate__ (Default: __auto__)
 __--svg__ | string | Path to the output SVG file (Default: __&lt;structureFile basename&gt;.svg__)
 __--noLegend__ | | Omits legends from the exported SVG
+__--noPk__ | | Omits pseudoknot archs from the exported SVG<br/>__Note:__ this has no effect on Stockholm alignments (use `--noLabels` and `--noInsets` instead)
+__--noLabels__ | | Omits Stockholm annotation labels (`SS_cons` lines) from the exported SVG
+__--noInsets__ | | Omits inset panels for non-nested interactions in Stockholm alignments from the exported SVG
 
