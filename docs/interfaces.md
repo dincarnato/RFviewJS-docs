@@ -130,4 +130,4 @@ __--noLegend__ | | Omits legends from the exported SVG
 __--noPk__ | | Omits pseudoknot archs from the exported SVG<br/>__Note:__ this has no effect on Stockholm alignments (use `--noLabels` and `--noInsets` instead)
 __--noLabels__ | | Omits Stockholm annotation labels (`SS_cons` lines) from the exported SVG
 __--noInsets__ | | Omits inset panels for non-nested interactions in Stockholm alignments from the exported SVG
-
+__--incSsEnds__ | | Includes single-stranded 5'/3' ends in Stockholm structures
