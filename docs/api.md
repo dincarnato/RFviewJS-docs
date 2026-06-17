@@ -212,6 +212,8 @@ When `label` is provided, it overrides the name extracted from the file (e.g., `
 
 Stockholm files are parsed into a consensus structure. The alignment view (conservation colors, alignment track) is shown alongside the structure diagram. Gap-only columns are filtered out. Position labels are remapped so that covariation data loaded afterwards aligns correctly. For additional details, please see __[Visualization of structures from Stockholm alignments](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#visualization-of-structures-from-stockholm-alignments)__.
 
+Furthermore, any additional `#=GC SS_cons_*` entry in the file is processed and labeled on the consensus structure. Non-nested interactions (such as pseudoknots, cross-covariations, etc.) are displayed as separate insets and labeled. Hovering on the inset causes the corresponding bases in the consensus structure to glow up.
+
 
 #### Fetching from Rfam
 
