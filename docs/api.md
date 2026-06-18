@@ -72,6 +72,7 @@ const viewer = new RFviewJS(container, options);
 | `showInsets` | `boolean` | `true` | Shows inset panels of non-nested interactions for Stockholm structures on load |
 | `showLabels` | `boolean` | `true` | Shows labels of SS_cons annotations for Stockholm structures on load |
 | `showSsEnds` | `boolean` | `false` | Shows single-stranded (unstructured) nucleotides at either ends of a structure (off by default) |
+| `autoRefit` | `boolean` | `true` | Automatically refits structure to the canvas upon helix rotation |
 | `transitionDuration` | `numeric` | `600` | Duration (in ms) of the transition when switching between alternative structures that share the same sequence |
 | `buttons` | `object` \| `false` | all on | Fine-grained toolbar control (see [Toolbar buttonw](#toolbar-buttons) below) |
 | `width` | `numeric` \| `string` | — | Width of the container (e.g. `800` or `'100%'`) |
@@ -98,6 +99,7 @@ const viewer = new RFviewJS(container, {
     zoomIn:          true,   // Zoom in
     zoomOut:         true,   // Zoom out
     fit:             true,   // Fit structure to canvas
+    autoRefit:       true,   // Automatically refits structure to canvas upon helix rotation
     reset:           true,   // Layout reset
     save:            true,   // SVG export
     indices:         true,   // Toggle display position indices
