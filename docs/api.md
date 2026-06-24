@@ -72,6 +72,7 @@ const viewer = new RFviewJS(container, options);
 | `showInsets` | `boolean` | `true` | Shows inset panels of non-nested interactions for Stockholm structures on load |
 | `showLabels` | `boolean` | `true` | Shows labels of SS_cons annotations for Stockholm structures on load |
 | `showSsEnds` | `boolean` | `false` | Shows single-stranded (unstructured) nucleotides at either ends of a structure (off by default) |
+| `showPercCanonical` | `boolean` | `false` | Activates % canonical pairs coloring on load for Stockholm alignments (colors every base-pair by the percentage of sequences in the alignment that form a canonical pair [AU, GC or GU] at that position). It has no effect on non-Stockholm structures. |
 | `autoRefit` | `boolean` | `true` | Automatically refits structure to the canvas upon helix rotation |
 | `transitionDuration` | `numeric` | `600` | Duration (in ms) of the transition when switching between alternative structures that share the same sequence |
 | `buttons` | `object` \| `false` | all on | Fine-grained toolbar control (see [Toolbar buttonw](#toolbar-buttons) below) |
@@ -109,6 +110,7 @@ const viewer = new RFviewJS(container, {
     insets:          true,   // Toggle display of inset panels (Stockholm structures)
     labels:          true,   // Toggle display of labels from SS_cons annotation lines (Stockholm structures)
     ssEnds:          true,   // Toggle display single-stranded bases at either ends of a structure (when present)
+    percCanonical:   true,   // Toggle display % canonical pairs coloring (Stockholm structures)
     layout:          true,   // Structure rendering layout switching
     toolbarPos:      true,   // Toolbar repositioning
   }
@@ -125,6 +127,7 @@ Omitted keys default to `true`. Setting `buttons: false` is equivalent to settin
 | `fit()` | | Fits the current structure to the canvas, with a small padding. Called automatically after every `load()` |
 | `reset()` | | Redraws the current structure from scratch (discards any manual helix rotations) |
 | `clear()` | | Removes all structures and annotations and resets the viewer to a blank state |
+| `toggleLayout() | | Switches the rendering layout between NAView and Radiate, preserving all annotations and canon state |
 | `clearCurrent()` | | Removes only the currently active structure. The remaining structures stay loaded and the viewer switches to the next one. Falls back to `clear()` if only one structure is loaded |
 | `switchToStructure()` | `index` \| `label` | Switches to another structure. Structures can be specified via their 0-based index (which follows the order of loading) or by label string. If sequences match, therefore structures represent alternative conformations of the same RNA, a smooth animated transition is triggered |
 | `setShowIndices()` | `bool` | Shows or hides position index labels |

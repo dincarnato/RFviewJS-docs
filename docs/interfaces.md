@@ -98,6 +98,8 @@ The user can switch between __Structure view__ and __Alignment view__. In alignm
   <img src="http://rfview.incarnatolab.com/images/RFview_alignment_view.png" />
 </p>
 
+Furthermore, RFview automatically computes the percentage of sequences with a canonical base-pair (AU, GC, GU) at each paired position. When a Stockholm structure is loaded, a % canonical pairs toggle button (%) appears in the toolbar. Activating it colors every base-pair using a red→yellow→green gradient. The gradient stop colors are adjustable via the Settings dialog. This mode also drives bond rendering in the alignment view: positions where canonical pairs are the majority (&gt;50%) are drawn a line, while non-canonical-majority positions are drawn as a dot.
+
 
 ## Command Line Interface (CLI)
 
@@ -123,9 +125,11 @@ __--structureFile__ | string | Path to a structure file (.db, .dbn, .ct, .txt) o
 __--rfam__ | string | Rfam family ID to fetch directly from Rfam (e.g., RF00162)<br/>__Note:__ `--rfam` and `--structureFile` are mutually exclusive
 __--xml__ | string | Reactivity file (in [RNA Framework's XML format](https://rnaframework-docs.readthedocs.io/en/latest/rf-norm/#output-xml-files))
 __--basePairAnno__ | string | Pair-annotation file (.tsv, .txt) or R-scape's .cov file
+__--percCanonical__ | | For Stockholm alignments, colors every base-pair by % canonical pairs computed from the alignment
 __--helixCovAnno__ | string | R-scape's .helixcov helix-level covariation file
 __--layout__ | string | Layout for RNA secondary structure rendering:  __auto__ (automatically determines the best layout between naview and radiate to avoid overlaps between helices), __naview__, or __radiate__ (Default: __auto__)
 __--svg__ | string | Path to the output SVG file (Default: __&lt;structureFile basename&gt;.svg__)
+__--pdf__ | string | Path to the output PDF file
 __--noLegend__ | | Omits legends from the exported SVG
 __--noPk__ | | Omits pseudoknot archs from the exported SVG<br/>__Note:__ this has no effect on Stockholm alignments (use `--noLabels` and `--noInsets` instead)
 __--noLabels__ | | Omits Stockholm annotation labels (`SS_cons` lines) from the exported SVG
