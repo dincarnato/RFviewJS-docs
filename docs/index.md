@@ -11,8 +11,10 @@ __[RFviewJS](https://github.com/dincarnato/RFviewJS)__ is a self-contained JavaS
 
 - automatic layout selection (Radiate vs. NAView)
 - manual helix rotation, reactivity color mapping (SHAPE/DMS)
+- R2R-faithful consensus rendering of Stockholm alignments (sequence weighting, % canonical pairs, alignment view)
 - base-pair and helix-level covariation annotations from R-scape
-- CSS styling
+- an __outline mode__ that reduces the structure to its backbone, for highlighting domains in color
+- CSS styling, with 14 ready-made themes
 - SVG export
 
 Furthermore, thanks to the power of __[Electron](https://www.electronjs.org/)__, __RFview__ is also provided as a stand-alone app for Windows, Linux and Mac.

@@ -220,7 +220,15 @@ CP000262.1/1070832-1070913 GACUGUUUGAU----
 //
 ```
 
-Alignments __must contain__ the `#=GC SS_cons` line.
+Alignments __must contain__ the `#=GC SS_cons` line. Interleaved blocks are supported, and a file may contain several alignments separated by `//`, each of which becomes a separate structure. Alignments of any size can be loaded: every sequence contributes to the consensus, while only the first 1,000 are kept for the alignment view.
+
+Additional `#=GC SS_cons_<name>` lines (e.g. `#=GC SS_cons_pk_1`, or the motif lines written by R-scape's CaCoFold) are drawn as labeled annotations, and the base pairs they contain are shown in inset panels (see __[Visualization of structures from Stockholm alignments](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#visualization-of-structures-from-stockholm-alignments)__). WUSS brackets (`<>`, `()`, `[]`, `{}`) and upper/lower-case letter pairs are accepted in all structure lines.
+
+__Note:__ R-scape versions up to 2.6.20 can write corrupted tag names in `.cacofold.sto` files (stray characters between `SS_cons` and `_<name>`, caused by a bug in `write_omsa_CaCoFold()`). Such lines are ignored by RFview. The affected tags can be repaired with:
+
+```bash
+perl -pe 's/^(#=GC SS_cons)[^\x20_]+(_(?:rm\d+_)?(?:nested|pk|nc|tr|sc|xc|pc)_\d+)/$1$2/' in.sto > fixed.sto
+```
 
 
 ## Reactivity

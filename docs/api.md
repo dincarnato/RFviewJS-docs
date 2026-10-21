@@ -72,6 +72,9 @@ const viewer = new RFviewJS(container, options);
 | `showInsets` | `boolean` | `true` | Shows inset panels of non-nested interactions for Stockholm structures on load |
 | `showLabels` | `boolean` | `true` | Shows labels of SS_cons annotations for Stockholm structures on load |
 | `showSsEnds` | `boolean` | `false` | Shows single-stranded (unstructured) nucleotides at either ends of a structure (off by default) |
+| `showPseudoknots` | `boolean` | `true` | Shows pseudoknot arcs on load (non-Stockholm structures) |
+| `outlineMode` | `boolean` | `false` | Starts in [outline mode](#outline-mode) (backbone only, with colored domains) |
+| `theme` | `string` | — | Name of a theme to apply, e.g. `'dark'`: the class `rv-theme-<name>` is added to the viewer root, so the matching stylesheet from the `css/` folder must be loaded (see [Themes](#themes)) |
 | `showPercCanonical` | `boolean` | `false` | Activates % canonical pairs coloring on load for Stockholm alignments (colors every base-pair by the percentage of sequences in the alignment that form a canonical pair [AU, GC or GU] at that position). It has no effect on non-Stockholm structures. |
 | `autoRefit` | `boolean` | `true` | Automatically refits structure to the canvas upon helix rotation |
 | `transitionDuration` | `numeric` | `600` | Duration (in ms) of the transition when switching between alternative structures that share the same sequence |
@@ -110,7 +113,10 @@ const viewer = new RFviewJS(container, {
     insets:          true,   // Toggle display of inset panels (Stockholm structures)
     labels:          true,   // Toggle display of labels from SS_cons annotation lines (Stockholm structures)
     ssEnds:          true,   // Toggle display single-stranded bases at either ends of a structure (when present)
+    weighting:       true,   // Toggle sequence weighting of the consensus (Stockholm structures)
     percCanonical:   true,   // Toggle display % canonical pairs coloring (Stockholm structures)
+    alignment:       true,   // Switch to the alignment view (Stockholm structures)
+    outline:         true,   // Toggle outline mode
     layout:          true,   // Structure rendering layout switching
     toolbarPos:      true,   // Toolbar repositioning
   }
@@ -127,7 +133,7 @@ Omitted keys default to `true`. Setting `buttons: false` is equivalent to settin
 | `fit()` | | Fits the current structure to the canvas, with a small padding. Called automatically after every `load()` |
 | `reset()` | | Redraws the current structure from scratch (discards any manual helix rotations) |
 | `clear()` | | Removes all structures and annotations and resets the viewer to a blank state |
-| `toggleLayout() | | Switches the rendering layout between NAView and Radiate, preserving all annotations and canon state |
+| `toggleLayout()` | | Switches the rendering layout between NAView and Radiate, preserving all annotations and canon state |
 | `clearCurrent()` | | Removes only the currently active structure. The remaining structures stay loaded and the viewer switches to the next one. Falls back to `clear()` if only one structure is loaded |
 | `switchToStructure()` | `index` \| `label` | Switches to another structure. Structures can be specified via their 0-based index (which follows the order of loading) or by label string. If sequences match, therefore structures represent alternative conformations of the same RNA, a smooth animated transition is triggered |
 | `setShowIndices()` | `bool` | Shows or hides position index labels |
@@ -137,8 +143,16 @@ Omitted keys default to `true`. Setting `buttons: false` is equivalent to settin
 | `setShowLabels()` | `bool` | Toggles labels for SS_cons annotation lines (Stockholm structures) |
 | `setShowSsEnds()` | `bool` | Toggles rendering of single-stranded nucleotides at either ends of a structure |
 | `setLayoutAlgorithm()` | `algorithm` | Switches the RNA structure rendering algorithm (`'auto'`, `'radiate'`, or `'naview'`) and re-renders |
-| `fetchRfam()` | `id` | Fetches a Stockholm alignment from Rfam by family ID (e.g., `'RF00162'`) and loads it |
-| `exportSVGString()` | | Renders the current structure and returns it as an SVG string. Useful for programmatic export without triggering a file-save dialog |
+| `fetchRfam()` | `id` | Fetches a Stockholm alignment from Rfam by family ID (e.g., `'RF00162'`) and loads it. Returns a promise |
+| `exportSVGString()` | | Renders the current structure and returns it as an SVG string. Useful for programmatic export without triggering a file-save dialog. In outline mode, the outline (backbone, domains and legend) is exported instead |
+| `setOutlineMode()` | `bool` | Turns [outline mode](#outline-mode) on or off |
+| `getOutlineMode()` | | Returns whether outline mode is on |
+| `addOutlineDomain()` | `domain` | Adds a [domain](#outline-mode) to the current structure. Missing keys get defaults, and positions are clamped to the RNA. Returns the stored domain |
+| `removeOutlineDomain()` | `index` | Removes the domain at the given 0-based index |
+| `getOutlineDomains()` | | Returns a copy of the current structure's domains |
+| `setOutlineDomains()` | `array` | Replaces the current structure's domains |
+| `clearOutlineDomains()` | | Removes all domains of the current structure |
+| `destroy()` | | Removes the viewer from the page and releases its listeners and observers |
 
 
 ### load()
@@ -215,7 +229,7 @@ viewer.load({ fileText: structureFileText });
 
 When `label` is provided, it overrides the name extracted from the file (e.g., `#=GF AC` or `#=GF ID` for Stockholm files). If the file contains multiple records, the label is suffixed with `(1)`, `(2)`, and so on.
 
-Stockholm files are parsed into a consensus structure. The alignment view (conservation colors, alignment track) is shown alongside the structure diagram. Gap-only columns are filtered out. Position labels are remapped so that covariation data loaded afterwards aligns correctly. For additional details, please see __[Visualization of structures from Stockholm alignments](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#visualization-of-structures-from-stockholm-alignments)__.
+Stockholm files are parsed into an R2R-style consensus structure, computed from every sequence in the file (GSC sequence weights for up to 1,000 sequences, position-based weights above). Columns with fewer than 25% residues are removed, as R-scape does before calling R2R, and position labels keep the original alignment column numbers, so that covariation data loaded afterwards aligns correctly. The alignment view shows the first 1,000 sequences. For additional details, please see __[Visualization of structures from Stockholm alignments](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#visualization-of-structures-from-stockholm-alignments)__.
 
 Furthermore, any additional `#=GC SS_cons_*` entry in the file is processed and labeled on the consensus structure. Non-nested interactions (such as pseudoknots, cross-covariations, etc.) are displayed as separate insets and labeled. Hovering on the inset causes the corresponding bases in the consensus structure to glow up.
 
@@ -255,6 +269,35 @@ viewer.switchToStructure(1);      // Switches to structure RF00504
 viewer.loadCov(covFileText);      // Loads base-pair covariation data from R-scape's .cov file text
 viewer.loadCov(helixCovFileText); // Loads helix-level covariation data from R-scape's .helixcov file text
 ```
+
+
+## Outline mode
+
+Outline mode reduces the structure to its backbone, drawn as a single thick line, over which colored __domains__ can be highlighted (see [the interface description](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#outline-mode)). Domains belong to the structure they were defined on, so each structure in a multi-structure viewer keeps its own set, and they survive toggling the mode, re-layouts and the SS ends toggle.
+
+```js
+viewer.setOutlineMode(true);
+
+viewer.setOutlineDomains([
+  { name: "5' domain", start: 1,   end: 120, color: '#e6194b' },
+  { name: 'PK region', start: 121, end: 260, color: '#4363d8' },
+]);
+viewer.addOutlineDomain({ start: 300, end: 9999 });   // "Domain #3", black, end clamped to the last base
+
+const domains = viewer.getOutlineDomains();           // [{name, start, end, color}, ...]
+const svg = viewer.exportSVGString();                 // outline + domains + legend
+```
+
+Each domain is an object:
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `name` | `string` | `Domain #k` | Shown in the legend |
+| `start` | `numeric` | end of the previous domain + 1 (or the first base) | First base of the domain, inclusive |
+| `end` | `numeric` | last base | Last base of the domain, inclusive |
+| `color` | `string` | `#000000` | Hex color |
+
+__Note:__ unlike `pairAnnotations`, `start` and `end` are __1-based__ and follow the numbering shown by the index labels: base numbers for plain structures, original alignment column numbers for structures loaded from Stockholm alignments. Values outside the RNA are clamped, and `start` &gt; `end` is swapped. The line color and thickness are controlled by the `--rv-outline-color` and `--rv-outline-width` [CSS custom properties](#outline-mode_1).
 
 
 ## Color maps
@@ -438,6 +481,7 @@ viewer.loadHelixCov(helixCovText);
 | Method | Description |
 |--------|-------------|
 | `RFviewJS.parseStockholmFile(text, labelFallback)` | Parses a Stockholm alignment and returns an array of structure-record objects suitable for spreading into a `structures` array (the label is taken from `#=GF ID` or `#=GF AC`, falling back to `labelFallback`) |
+| `RFviewJS.parseStockholmFileChunked(file, labelFallback, feedLines, useAllSeqs, onProgress)` | Streaming variant of `parseStockholmFile()` for files too large to hold in memory: `feedLines(file, onLine)` is an async function that reads the input and calls `onLine(line)` for every line. Every sequence contributes to the consensus. With `useAllSeqs`, every sequence (instead of the first 1,000) is also kept for the alignment view. Returns a promise |
 | `RFviewJS.parseDbFile(text, label)` | Parses a dot-bracket or CT file and returns an array of structure records |
 | `RFviewJS.parseCTFile(text)` | Parses a CT file and returns structure records |
 | `RFviewJS.parseXmlReactivity(text)` | Parses an RNA Framework XML reactivity file |
@@ -466,6 +510,7 @@ All visual properties are exposed as CSS custom properties set on the `.rv` root
 | `--rv-accent3` | `#8250df` | Tertiary accent (purple) |
 | `--rv-error-border` | — | Border color for error states |
 | `--rv-error` | `#cf222e` | Error messages |
+| `--rv-logo-filter` | `none` | CSS filter applied to the RFview logo in the About dialog (`invert(1)` for dark themes) |
 
 
 ### Structure drawing
@@ -491,6 +536,8 @@ All visual properties are exposed as CSS custom properties set on the `.rv` root
 | `--rv-base-index-font-size` | `12` | Position index label size in px |
 | `--rv-base-index-offset` | `26` | Distance from base centre to index label |
 | `--rv-noncanon-dot-r` | `4.5` | Radius of the dot drawn for non-canonical base pairs |
+| `--rv-noncanon-dot` | `--rv-basepair` | Color of the dot drawn for non-canonical base pairs |
+| `--rv-annot-label-font-size` | `12` | Font size of the labels of `SS_cons_*` annotations (Stockholm structures) |
 | `--rv-pair-break` | `#ef4444` | Color of base-pairs lost between start and end structure (sharing same sequence) during the animated structure transition |
 | `--rv-pair-form` | `#22c55e` | Color of base-pairs gained between start and end structure (sharing same sequence) during the animated structure transition |
 | `--rv-rot-line` | `#0969da80` | Color of the rotation axis line shown during helix rotation |
@@ -501,7 +548,7 @@ All visual properties are exposed as CSS custom properties set on the `.rv` root
 
 | Property | Default | Description |
 |---|---|---|
-| `--rv-inset-max-width` | `120px` | Maximum width of inset panels (automatically set to 1/20th of the canvas width at render time, overriding this default) |
+| `--rv-inset-max-width` | `120px` | Maximum width of inset panels (automatically set to 1/15th of the canvas width at render time, overriding this default) |
 | `--rv-inset-min-width` | `80px` | Minimum width of inset panels |
 | `--rv-inset-hover-glow` | `8px` | Glow radius of bases in the main structure when hovering over an inset panel |
 
@@ -517,7 +564,26 @@ All visual properties are exposed as CSS custom properties set on the `.rv` root
 | `--rv-helix-annot-padding` | `25` | Padding for helix-level annotation boxes |
 | `--rv-helix-annot-color` | `#aff0a8` | Helix-level annotation box color |
 
-Several CSS stylesheet examples are available from the [Git repository](https://github.com/dincarnato/rfviewjs) (under `css/`).
+
+### Outline mode
+
+| Property | Default | Description |
+|---|---|---|
+| `--rv-outline-color` | `#000000` | Color of the backbone line in outline mode (themes set it to their text color) |
+| `--rv-outline-width` | `25` | Thickness of the backbone line and of the domains in outline mode, in SVG units (also adjustable from the Settings dialog) |
+
+
+### Themes
+
+Fourteen ready-made themes are available from the [Git repository](https://github.com/dincarnato/rfviewjs) (under `css/`): `light`, `dark`, `contrast`, `catppuccin`, `dracula`, `forest`, `midnight`, `nord`, `ocean`, `rosepine`, `solarized-dark`, `solarized-light`, `warm`, and `grey`. Each stylesheet is scoped to the class `rv-theme-<name>`, which can be added to the viewer either through the `theme` constructor option or by hand (`rv-grey.css` is the exception: it applies to every viewer on the page). Load the stylesheet after `RFview.js`:
+
+```html
+<script src="RFview.js"></script>
+<link rel="stylesheet" href="css/rv-dark.css">
+<script>
+  const viewer = new RFviewJS(document.getElementById('viewer'), { theme: 'dark' });
+</script>
+```
 
 
 ## Examples
