@@ -74,6 +74,8 @@ const viewer = new RFviewJS(container, options);
 | `showSsEnds` | `boolean` | `false` | Shows single-stranded (unstructured) nucleotides at either ends of a structure (off by default) |
 | `showPseudoknots` | `boolean` | `true` | Shows pseudoknot arcs on load (non-Stockholm structures) |
 | `outlineMode` | `boolean` | `false` | Starts in [outline mode](#outline-mode) (backbone only, with colored domains) |
+| `outlineDomains` | `array` | — | [Domains](#outline-mode) to define on load, as `{name, start, end, color}` objects. At the top level they apply to every structure, and a structure entry can carry its own list instead |
+| `weighting` | `boolean` | `true` | Starts with sequence weighting of the consensus on (R2R GSC weights up to 1000 sequences, position-based weights above) or off (plain frequencies). Stockholm alignments only, it can also be given to `load()` |
 | `theme` | `string` | — | Name of a theme to apply, e.g. `'dark'`: the class `rv-theme-<name>` is added to the viewer root, so the matching stylesheet from the `css/` folder must be loaded (see [Themes](#themes)) |
 | `showPercCanonical` | `boolean` | `false` | Activates % canonical pairs coloring on load for Stockholm alignments (colors every base-pair by the percentage of sequences in the alignment that form a canonical pair [AU, GC or GU] at that position). It has no effect on non-Stockholm structures. |
 | `autoRefit` | `boolean` | `true` | Automatically refits structure to the canvas upon helix rotation |
@@ -142,6 +144,8 @@ Omitted keys default to `true`. Setting `buttons: false` is equivalent to settin
 | `setShowInsets()` | `bool` | Toggles inset panels for non-nested interactions (Stockholm structures) |
 | `setShowLabels()` | `bool` | Toggles labels for SS_cons annotation lines (Stockholm structures) |
 | `setShowSsEnds()` | `bool` | Toggles rendering of single-stranded nucleotides at either ends of a structure |
+| `setWeighting()` | `bool` | Turns sequence weighting of the consensus on or off (Stockholm structures) |
+| `getWeighting()` | | Returns whether sequence weighting is on |
 | `setLayoutAlgorithm()` | `algorithm` | Switches the RNA structure rendering algorithm (`'auto'`, `'radiate'`, or `'naview'`) and re-renders |
 | `fetchRfam()` | `id` | Fetches a Stockholm alignment from Rfam by family ID (e.g., `'RF00162'`) and loads it. Returns a promise |
 | `exportSVGString()` | | Renders the current structure and returns it as an SVG string. Useful for programmatic export without triggering a file-save dialog. In outline mode, the outline (backbone, domains and legend) is exported instead |
@@ -176,6 +180,8 @@ viewer.load({
   pairAnnotColorMap: { ... },  // Color map for base-pair annotation boxes
   
   helixAnnotations:  [...],    // see "Helix-level annotations"
+
+  outlineDomains:    [...],    // see "Outline mode" section below
 });
 ```
 
@@ -274,6 +280,21 @@ viewer.loadCov(helixCovFileText); // Loads helix-level covariation data from R-s
 ## Outline mode
 
 Outline mode reduces the structure to its backbone, drawn as a single thick line, over which colored __domains__ can be highlighted (see [the interface description](https://rfviewjs-docs.readthedocs.io/en/latest/interfaces/#outline-mode)). Domains belong to the structure they were defined on, so each structure in a multi-structure viewer keeps its own set, and they survive toggling the mode, re-layouts and the SS ends toggle.
+
+Domains can be given in the config, at the top level (shared by every structure) or inside a `structures` entry (that structure only), with the same keys and defaults as below:
+
+```js
+const viewer = new RFviewJS(el, {
+  stockholmText: text,
+  outlineMode: true,
+  outlineDomains: [
+    { name: 'P1', start: 1,  end: 60,  color: '#e6194b' },
+    { name: 'P2', start: 61, end: 140, color: '#4363d8' },
+  ],
+});
+```
+
+Or from the API, after loading:
 
 ```js
 viewer.setOutlineMode(true);
